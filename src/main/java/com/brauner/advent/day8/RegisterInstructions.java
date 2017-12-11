@@ -14,7 +14,11 @@ public class RegisterInstructions {
 
 	Map<String, Integer> registerMap;
 
+	Integer everGreat;
+
 	public int evaluateLargestValueInRegisters(String inputPath) throws IOException {
+
+		everGreat = 0;
 
 		registerMap = new HashMap<>();
 
@@ -31,6 +35,8 @@ public class RegisterInstructions {
 			if (mapValue > greaterValue)
 				greaterValue = mapValue;
 		}
+
+		System.out.println("Ever great value: " + everGreat);
 		return greaterValue;
 	}
 
@@ -62,6 +68,8 @@ public class RegisterInstructions {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
+		if (value > everGreat)
+			everGreat = value;
 		registerMap.put(name, value);
 	}
 
