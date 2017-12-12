@@ -21,4 +21,16 @@ public class DigitalPlumberTest {
         System.out.println("Reaches Zero: " + plumber.find_0_GroupsId("src/test/resources/plumber.txt"));
 
     }
+
+    @Test
+    public void findDistinctGroupsIdTest() throws Exception {
+
+        DigitalPlumber plumber = new DigitalPlumber();
+        System.out.println("Distinct Groups: " + plumber.findDistinctGroups("src/test/resources/plumberTest.txt"));
+
+        plumber = new DigitalPlumber();
+        System.out.println("Distinct Groups: " + plumber.findDistinctGroups("src/test/resources/plumber.txt"));
+
+    }
+
 }
