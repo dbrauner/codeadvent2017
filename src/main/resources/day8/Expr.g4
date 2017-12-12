@@ -13,6 +13,7 @@ expr:   INT 'if' expr
     |   expr ('>='|'<=') expr
     |   expr ('=='|'!=') expr
     |   ID
+    |   INT
     ;
 
 ID : [a-zA-Z]+ ; // match identifiers
