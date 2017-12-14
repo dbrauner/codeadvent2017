@@ -15,7 +15,7 @@ public class PackageScanner {
 	int maxValue = 0;
 	int severity;
 
-	Map<Integer, Integer[]> layers;
+	HashMap<Integer, Layer> layers;
 	int index;
 
 	public int sneakThroughFirewall(String inputPath) throws IOException {
@@ -29,12 +29,11 @@ public class PackageScanner {
 
 		for (int i = 0; i <= maxValue; i++) {
 			scan();
-			int positionStatus = 0;
 			if (layers.containsKey(i)) {
-				positionStatus = layers.get(i)[0];
-			}
-			if (positionStatus == UP || positionStatus == DOWN) {
-				severity += i * layers.get(i).length;
+				Layer layer = layers.get(i);
+				if (layer.scanning == 0 ) {
+					severity += i * layer.lenght;
+				}
 			}
 		}
 
@@ -53,29 +52,34 @@ public class PackageScanner {
 			stream.forEach(this::processLine);
 		}
 
+
+		HashMap<Integer, Layer> copy = this.cloneMap(layers);
+
 		while(true) {
-			for (Integer[] layer : layers.values()) {
-				Arrays.fill(layer, 0);
+			delays ++;
+			for (Layer layer : layers.values()) {
+				layer.direction = 0;
 			}
 
-			for (int i = 0; i < delays; i++) {
-				scan();
-			}
+			layers = cloneMap(copy);
+			scan();
+
+			copy = cloneMap(layers);
+
 			for (int i = 0; i <= maxValue; i++) {
 				scan();
-				int positionStatus = 0;
 				if (layers.containsKey(i)) {
-					positionStatus = layers.get(i)[0];
-				}
-				if (positionStatus == UP || positionStatus == DOWN) {
-//					System.out.println("caught in index: " + i + "delay :" + delays);
-					severity += 1;
+					Layer layer = layers.get(i);
+					if (layer.scanning == 0) {
+						severity = 1;
+						break;
+					}
 				}
 			}
 			if (severity == 0) {
 				break;
 			}
-			delays ++;
+
 			severity = 0;
 			if (delays == 0) {
 				System.out.println("shit zero again!");
@@ -97,6 +101,7 @@ public class PackageScanner {
 				System.out.println("3 million mark!");
 			if (delays == 3870382)
 				System.out.println("shit!!!");
+
 		}
 		return delays;
 	}
@@ -107,44 +112,48 @@ public class PackageScanner {
 		Integer depth = Integer.parseInt(s.substring(0, s.indexOf(":")));
 		Integer range = Integer.parseInt(s.substring(s.lastIndexOf(" ") + 1));
 
-		Integer[] layer = new Integer[range];
-		Arrays.fill(layer, 0);
+		Layer layer = new Layer(0, depth, range, 0);
 		layers.put(depth, layer);
 		maxValue = depth;
 	}
 
 	private void scan() {
-		for (Integer[] layer : layers.values()) {
-			int scanIndex = getScanIndex(layer);
-			nextScanStep(layer, scanIndex);
+		for (Layer layer : layers.values()) {
+			nextScanStep(layer);
 		}
 
 	}
 
-	private void nextScanStep(Integer[] layer, int scanIndex) {
-		if (layer[scanIndex] == 0) {
-			layer[scanIndex] = UP;
+	private HashMap<Integer, Layer> cloneMap(Map<Integer, Layer> layerMap) {
+		HashMap<Integer, Layer> copy = new HashMap<>();
+		for (Layer layer : layerMap.values()) {
+			copy.put(layer.depth, new Layer(layer));
+		}
+		return copy;
+	}
+
+	private void nextScanStep(Layer layer) {
+		if (layer.direction == 0) {
+			layer.scanning = 0;
+			layer.direction = UP;
 			return;
 		}
-		if (layer[scanIndex] == UP) {
-			layer[scanIndex] = 0;
-			if (scanIndex < layer.length - 1) {
-				scanIndex++;
-				layer[scanIndex] = UP;
+		if (layer.direction == UP) {
+			if (layer.scanning < layer.lenght - 1) {
+				layer.scanning++;
 				return;
 			}
-			scanIndex--;
-			layer[scanIndex] = DOWN;
+			layer.scanning--;
+			layer.direction = DOWN;
 			return;
 		}
-		layer[scanIndex] = 0;
-		if (scanIndex > 0) {
-			scanIndex--;
-			layer[scanIndex] = DOWN;
+		if (layer.scanning > 0) {
+			layer.scanning --;
+			layer.direction = DOWN;
 			return;
 		}
-		scanIndex++;
-		layer[scanIndex] = UP;
+		layer.scanning++;
+		layer.direction = UP;
 	}
 
 	private int getScanIndex(Integer[] layer) {
