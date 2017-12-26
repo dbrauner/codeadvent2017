@@ -1,4 +1,4 @@
-package com.brauner.advent.day3;
+package com.brauner.advent;
 
 /**
  * Created by douglas on 08/12/2017.
