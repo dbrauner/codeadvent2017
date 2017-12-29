@@ -1,5 +1,6 @@
 package com.brauner.advent.day3;
 
+import com.brauner.advent.Direction;
 /**
  * Created by douglas on 08/12/2017.
  */
